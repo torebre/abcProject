@@ -1,0 +1,47 @@
+---
+title: "SMC Toy Example"
+author: "Tore Brede"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SMC Toy Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+library(testPackage)
+```
+
+Here is a setup of the toy example:
+
+```{r}
+toy.example.configuration <- smcToyExample()
+```
+
+
+```{r}
+result <- Smc(toy.example.configuration, max.iterations = 10)
+state.to.visualise <- length(result[["all.thetas"]])
+```
+
+
+```{r}
+thetas <- unlist(result[["all.thetas"]][state.to.visualise])
+PlotHistogram(thetas)
+```
+
+```{r}
+particles <- unlist(result[["all.particles"]][state.to.visualise])
+weights <- unlist(result[["all.weights"]][state.to.visualise])
+PlotParticles(particles, weights)
+```
+
+```{r}
+PlotEpsilonTrace(result, state.to.visualise)
+```
+
+```{r}
+PlotEssTrace(result, state.to.visualise)
+```
+
