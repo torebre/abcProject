@@ -10,7 +10,7 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-library(testPackage)
+library(abcProject)
 ```
 
 Here is a setup of the toy example:
