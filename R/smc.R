@@ -1,7 +1,3 @@
-
-
-
-
 #' Performs a run using a Sequential Markov Chain (SMC) method.
 #'
 #' This is an implementation of a SMC method. It will do a run
@@ -17,12 +13,13 @@ Smc <-
            start.epsilon = 10,
            stop.epsilon = 0.1,
            number.of.replicates = 1,
-           verbose = F
-           ) {
+           verbose = F) {
     SampleFunction <- smc.configuration[["SampleFunction"]]
-    ForwardKernelSample <- smc.configuration[["ForwardKernelSample"]]
+    ForwardKernelSample <-
+      smc.configuration[["ForwardKernelSample"]]
     DistanceFunction <- smc.configuration[["DistanceFunction"]]
-    GenerateRandomPrior <- smc.configuration[["GenerateRandomPrior"]]
+    GenerateRandomPrior <-
+      smc.configuration[["GenerateRandomPrior"]]
 
     variable.env <- new.env(parent = emptyenv())
 
@@ -60,7 +57,8 @@ Smc <-
         )
       my.env$particles <- my.env$particles[resampling.indices]
       my.env$thetas <- my.env$thetas[resampling.indices]
-      my.env$weights <- rep(1 / number.of.particles, number.of.particles)
+      my.env$weights <-
+        rep(1 / number.of.particles, number.of.particles)
     }
 
     AddValuesToLists <- function(my.counter) {
@@ -77,8 +75,8 @@ Smc <-
 
     while (T) {
       # Adaptation
-      if(verbose) {
-      print(paste("Current epsilon: ", current.epsilon))
+      if (verbose) {
+        print(paste("Current epsilon: ", current.epsilon))
       }
 
       AddValuesToLists(counter)
@@ -119,8 +117,8 @@ Smc <-
 
       # Resampling
       if (effective.sample.size < resample.ratio * number.of.particles) {
-        if(verbose) {
-        print(paste("Resampling at step: ", counter))
+        if (verbose) {
+          print(paste("Resampling at step: ", counter))
         }
         Resample(variable.env)
       }
@@ -137,13 +135,13 @@ Smc <-
       variable.env$particles <- iterated.samples$samples
       variable.env$thetas <- iterated.samples$theta
 
-      if(verbose) {
-      print(paste(
-        "Counter: ",
-        counter,
-        " Effective sample size: ",
-        effective.sample.size
-      ))
+      if (verbose) {
+        print(paste(
+          "Counter: ",
+          counter,
+          " Effective sample size: ",
+          effective.sample.size
+        ))
       }
 
       if (counter == max.iterations) {
