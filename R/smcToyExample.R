@@ -48,7 +48,6 @@ smcToyExample <- function() {
                                                   theta.old,
                                                   my.current.epsilon,
                                                   my.weights) {
-    # TODO Will this work if there are multiple replicates of a theta?
     temp <- sapply(theta.old, function(x) {
       x
     })
@@ -56,7 +55,7 @@ smcToyExample <- function() {
     empirical.variance <- var(temp) # temp[my.weights > 0])
 
     my.number.of.particles <- length(samples.old)
-    my.number.of.replicates <- length(samples.old[1])
+    my.number.of.replicates <- length(samples.old[[1]])
 
     # mean.theta <- mean(theta.old)
     # empirical.variance <- 0
@@ -98,8 +97,14 @@ smcToyExample <- function() {
       # Metropolis-Hastings ratio is the likelihood
 
       if (my.weights[j] == 0) {
-        theta.new[j] <- theta.candidate
-        samples.new[[j]] <- replicates.new
+
+        # Try to see what happens when the particles with no
+        # weight are left alone
+
+        # theta.new[j] <- theta.candidate
+        # samples.new[[j]] <- replicates.new
+
+
         # accepted <- accepted + 1
       }
       else {
@@ -107,6 +112,7 @@ smcToyExample <- function() {
         old.likelihood <-
           EvaluateLikelihoodSum(samples.new[j], my.current.epsilon)
 
+        # auto.accept <- false
         if (old.likelihood == 0) {
           next
         }

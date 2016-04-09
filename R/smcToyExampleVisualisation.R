@@ -19,9 +19,11 @@ VisualiseToyExampleState <-
     weights <- unlist(smc.result[["all.weights"]][state.to.visualise])
     particles <- unlist(smc.result[["all.particles"]][state.to.visualise])
 
+    distance.max <- max(unlist(result$all.particles))
+
     op <- par("mfrow" = c(2, 2))
     PlotHistogram(thetas)
-    PlotParticles(particles, weights)
+    PlotParticles(particles, weights, use.max = distance.max)
     PlotEpsilonTrace(smc.result, state.to.visualise)
     PlotEssTrace(smc.result, state.to.visualise)
     par(op)
@@ -31,33 +33,80 @@ VisualiseToyExampleState <-
 #' Plot particles.
 #'
 #' @export
-PlotParticles <- function(particles, weights) {
-  my.number.of.particles <- length(particles)
+PlotParticles <- function(particles, weights, cex = 0.1, use.max) {
+  my.number.of.replicates <- length(particles[[1]])
+  my.number.of.particles <- length(particles) * my.number.of.replicates
+
+  # print(paste("My number of particles: ", my.number.of.particles))
+
   sector.size <- 2 * pi / my.number.of.particles
-  particle.max <- max(particles)
+  if(missing(use.max)) {
+    particle.max <- max(unlist(particles))
+  }
+  else {
+    particle.max <- use.max
+  }
+
   cumulative.angle <- 0
   x.coords <- rep(NA, my.number.of.particles)
   y.coords <- rep(NA, my.number.of.particles)
   colors <- rep(NA, my.number.of.particles)
-  for (i in 1:my.number.of.particles) {
-    particle.distance <- particles[i]
-    x.coords[i] <- cos(cumulative.angle) * particle.distance
-    y.coords[i] <- sin(cumulative.angle) * particle.distance
-    cumulative.angle <- cumulative.angle + sector.size
 
-    if (weights[i] > 0) {
-      colors[i] <- "red"
+  for(j in 1:length(particles)) {
+    for(k in 1:length(particles[[1]])) {
+      particle.distance <- particles[[j]][k]
+      # if(particle.max < particle.distance) {
+      #   particle.max <- particle.distance
+      # }
+      current.particle.index <- (j - 1) * my.number.of.replicates + k
+      x.coords[current.particle.index] <- cos(cumulative.angle) * particle.distance
+      y.coords[current.particle.index] <- sin(cumulative.angle) * particle.distance
+      cumulative.angle <- cumulative.angle + sector.size
+
+      # print(paste("Weights: ", weights[i]))
+
+      # if(is.na(weights[[j]][k])) {
+      #   colors[current.particle.index] <- "black"
+      # }
+      # else {
+
+      # print(paste("Particle: ", current.particle.index, ". Weight: ", weights[j]))
+      #   colors[current.particle.index] <- hsv(h = weights[j])
+
+      # }
+
     }
-    else {
-      colors[i] <- "blue"
-    }
+
   }
+
+  # for (i in 1:my.number.of.particles) {
+  #   particle.distance <- particles[i]
+  #   x.coords[i] <- cos(cumulative.angle) * particle.distance
+  #   y.coords[i] <- sin(cumulative.angle) * particle.distance
+  #   cumulative.angle <- cumulative.angle + sector.size
+  #
+  #   # print(paste("Weights: ", weights[i]))
+  #
+  #   if(is.na(weights[i])) {
+  #     colors[i] <- "black"
+  #   }
+  #   else {
+  #     colors[i] <- hsv(h = weights[i])
+  #   }
+  #
+  #   # if (weights[i] > 0) {
+  #   #   colors[i] <- "red"
+  #   # }
+  #   # else {
+  #   #   colors[i] <- "blue"
+  #   # }
+  # }
 
   plot(
     x.coords,
     y.coords,
     pch = 16,
-    cex = 0.1,
+    cex = cex,
     xlim = c(-particle.max, particle.max),
     ylim = c(-particle.max, particle.max),
     col = colors,
@@ -117,7 +166,6 @@ PlotEpsilonTrace <- function(smc.result, state.to.visualise) {
     ylab = latex2exp::latex2exp("$\\epsilon_{n}$"),
     xlab = "n"
   )
-
 }
 
 #' Plot ESS trace.
@@ -138,3 +186,19 @@ PlotEssTrace <- function(smc.result, state.to.visualise) {
         xlab = "n",
         ylab = "EFF")
 }
+
+
+#' @export
+CreateGifAnimation <- function(smc.result, movie.name, skip.frames = 1) {
+  if (!requireNamespace("animation", quietly = TRUE)) {
+    stop("animation needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
+  run.length <- length(smc.result$epsilons)
+  animation::saveGIF(
+    for(j in seq(1, run.length, by = skip.frames)) {
+      VisualiseToyExampleState(smc.result, state.to.visualise = j)
+    }, movie.name = movie.name, interval = 0.3)
+}
+

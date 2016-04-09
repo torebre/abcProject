@@ -67,8 +67,7 @@ Smc <-
         effective.sample.size
       variable.env$all.thetas[[counter]] <- variable.env$thetas
       variable.env$all.weights[[counter]] <- variable.env$weights
-      variable.env$all.particles[[counter]] <-
-        unlist(variable.env$particles)
+      variable.env$all.particles[[counter]] <-variable.env$particles
     }
 
     counter <- 1
