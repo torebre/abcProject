@@ -2,10 +2,24 @@
 #'
 #' @export
 VisualiseToyExampleState <-
-  function(smc.result, state.to.visualise = -1) {
+  function(smc.result, state.to.visualise = -1, use.max, use.run.length, use.thetas) {
     if (!requireNamespace("latex2exp", quietly = TRUE)) {
       stop("latex2exp needed for this function to work. Please install it.",
            call. = FALSE)
+    }
+
+    if(missing(use.max)) {
+      distance.max <- max(unlist(result$all.particles))
+    }
+    else {
+      distance.max <- use.max
+    }
+
+    if(missing(use.run.length)) {
+      run.length <- state.to.visualise
+    }
+    else {
+      run.length <- use.run.length
     }
 
     if (state.to.visualise == -1) {
@@ -17,15 +31,18 @@ VisualiseToyExampleState <-
     epsilon <- smc.result[["epsilons"]][state.to.visualise]
     thetas <- unlist(smc.result[["all.thetas"]][state.to.visualise])
     weights <- unlist(smc.result[["all.weights"]][state.to.visualise])
-    particles <- unlist(smc.result[["all.particles"]][state.to.visualise])
-
-    distance.max <- max(unlist(result$all.particles))
+    particles <- smc.result[["all.particles"]][[state.to.visualise]]
 
     op <- par("mfrow" = c(2, 2))
-    PlotHistogram(thetas)
-    PlotParticles(particles, weights, use.max = distance.max)
-    PlotEpsilonTrace(smc.result, state.to.visualise)
-    PlotEssTrace(smc.result, state.to.visualise)
+    PlotHistogram(thetas, use.thetas)
+    # if(epsilon > 1) {
+    #   PlotParticles(particles, weights, use.max = distance.max, epsilon = epsilon[state.to.visualise])
+    # }
+    # else {
+      PlotParticles(particles, weights, use.max = distance.max)
+    # }
+    PlotEpsilonTrace(smc.result, state.to.visualise, use.run.length = run.length)
+    PlotEssTrace(smc.result, state.to.visualise, use.run.length = run.length)
     par(op)
   }
 
@@ -33,15 +50,22 @@ VisualiseToyExampleState <-
 #' Plot particles.
 #'
 #' @export
-PlotParticles <- function(particles, weights, cex = 0.1, use.max) {
+PlotParticles <- function(particles, weights, cex = 0.1, use.max, epsilon) {
+  epsilon.draw <- F
+  if (!missing(epsilon) && !requireNamespace("plotrix", quietly = TRUE)) {
+    stop("plotrix needed to draw epsilon circle. Please install it.",
+         call. = FALSE)
+  }
+  else {
+    epsilon.draw <- T
+  }
+
   my.number.of.replicates <- length(particles[[1]])
   my.number.of.particles <- length(particles) * my.number.of.replicates
 
-  # print(paste("My number of particles: ", my.number.of.particles))
-
   sector.size <- 2 * pi / my.number.of.particles
   if(missing(use.max)) {
-    particle.max <- max(unlist(particles))
+    particle.max <- max(abs(unlist(particles)))
   }
   else {
     particle.max <- use.max
@@ -55,52 +79,13 @@ PlotParticles <- function(particles, weights, cex = 0.1, use.max) {
   for(j in 1:length(particles)) {
     for(k in 1:length(particles[[1]])) {
       particle.distance <- particles[[j]][k]
-      # if(particle.max < particle.distance) {
-      #   particle.max <- particle.distance
-      # }
       current.particle.index <- (j - 1) * my.number.of.replicates + k
       x.coords[current.particle.index] <- cos(cumulative.angle) * particle.distance
       y.coords[current.particle.index] <- sin(cumulative.angle) * particle.distance
       cumulative.angle <- cumulative.angle + sector.size
-
-      # print(paste("Weights: ", weights[i]))
-
-      # if(is.na(weights[[j]][k])) {
-      #   colors[current.particle.index] <- "black"
-      # }
-      # else {
-
-      # print(paste("Particle: ", current.particle.index, ". Weight: ", weights[j]))
-      #   colors[current.particle.index] <- hsv(h = weights[j])
-
-      # }
-
+      colors[current.particle.index] <- hsv(h = weights[j])
     }
-
   }
-
-  # for (i in 1:my.number.of.particles) {
-  #   particle.distance <- particles[i]
-  #   x.coords[i] <- cos(cumulative.angle) * particle.distance
-  #   y.coords[i] <- sin(cumulative.angle) * particle.distance
-  #   cumulative.angle <- cumulative.angle + sector.size
-  #
-  #   # print(paste("Weights: ", weights[i]))
-  #
-  #   if(is.na(weights[i])) {
-  #     colors[i] <- "black"
-  #   }
-  #   else {
-  #     colors[i] <- hsv(h = weights[i])
-  #   }
-  #
-  #   # if (weights[i] > 0) {
-  #   #   colors[i] <- "red"
-  #   # }
-  #   # else {
-  #   #   colors[i] <- "blue"
-  #   # }
-  # }
 
   plot(
     x.coords,
@@ -112,6 +97,9 @@ PlotParticles <- function(particles, weights, cex = 0.1, use.max) {
     col = colors,
     ann = F
   )
+  # if(epsilon.draw) {
+  #   plotrix::draw.circle(0, 0, epsilon)
+  # }
   title("d(x, 0)")
 }
 
@@ -119,14 +107,20 @@ PlotParticles <- function(particles, weights, cex = 0.1, use.max) {
 #' Plot histogram.
 #'
 #' @export
-PlotHistogram <- function(thetas) {
+PlotHistogram <- function(thetas, use.thetas) {
   if (!requireNamespace("latex2exp", quietly = TRUE)) {
     stop("latex2exp needed for this function to work. Please install it.",
          call. = FALSE)
   }
 
-  theta.upper <- max(thetas)
-  theta.lower <- min(thetas)
+  if(missing(use.thetas)) {
+    theta.upper <- max(thetas)
+    theta.lower <- min(thetas)
+  }
+  else {
+    theta.lower <- use.thetas[1]
+    theta.upper <- use.thetas[2]
+  }
 
   Posterior2 <- function(my.theta) {
     0.5 * dnorm(0, mean = my.theta, sd = 1) + 0.5 * dnorm(0, mean = my.theta, sd = 1 / 10)
@@ -137,14 +131,15 @@ PlotHistogram <- function(thetas) {
   hist(
     unlist(thetas),
     freq = F,
-    ann = F
+    ann = F,
+    xlim = c(theta.lower, theta.upper)
   )
   title(latex2exp::latex2exp("$\\theta$"))
 
   curve(
     VectorizedPosterior2,
-    from = -5,
-    to = 5,
+    from = theta.lower,
+    to = theta.upper,
     add = T,
     col = "green"
   )
@@ -153,12 +148,19 @@ PlotHistogram <- function(thetas) {
 #' Plot epsilon trace.
 #'
 #' @export
-PlotEpsilonTrace <- function(smc.result, state.to.visualise) {
+PlotEpsilonTrace <- function(smc.result, state.to.visualise, use.run.length) {
+  if(missing(use.run.length)) {
+    run.length <- state.to.visualise
+  }
+  else {
+    run.length <- use.run.length
+  }
+
   plot(
     unlist(smc.result$epsilons)[1:state.to.visualise],
     type = "l",
     ann = F,
-    xlim = c(0, state.to.visualise),
+    xlim = c(0, run.length),
     ylim = c(0, 10)
   )
   title(
@@ -171,7 +173,14 @@ PlotEpsilonTrace <- function(smc.result, state.to.visualise) {
 #' Plot ESS trace.
 #'
 #' @export
-PlotEssTrace <- function(smc.result, state.to.visualise) {
+PlotEssTrace <- function(smc.result, state.to.visualise, use.run.length) {
+  if(missing(use.run.length)) {
+    run.length <- state.to.visualise
+  }
+  else {
+    run.length <- use.run.length
+  }
+
   ess.trace <- unlist(smc.result$effective.sample.sizes)[1:state.to.visualise]
   ess.max <- max(ess.trace)
   plot(
@@ -179,12 +188,11 @@ PlotEssTrace <- function(smc.result, state.to.visualise) {
     type = "l",
     ylim = c(0, ess.max),
     ann = F,
-    xlim = c(0, state.to.visualise)
+    xlim = c(0, run.length)
   )
-  # abline(h = 5000)
   title(main = "ESS",
         xlab = "n",
-        ylab = "EFF")
+        ylab = "ESS")
 }
 
 
@@ -195,10 +203,14 @@ CreateGifAnimation <- function(smc.result, movie.name, skip.frames = 1) {
          call. = FALSE)
   }
 
+  distance.max <- max(unlist(result$all.particles))
   run.length <- length(smc.result$epsilons)
+  all.thetas <- unlist(smc.result$all.thetas)
+  use.thetas <- c(min(all.thetas), max(all.thetas))
+
   animation::saveGIF(
     for(j in seq(1, run.length, by = skip.frames)) {
-      VisualiseToyExampleState(smc.result, state.to.visualise = j)
+      VisualiseToyExampleState(smc.result, state.to.visualise = j, use.max = distance.max, use.run.length = run.length, use.thetas = use.thetas)
     }, movie.name = movie.name, interval = 0.3)
 }
 

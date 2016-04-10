@@ -1,17 +1,18 @@
 Package: abcProject
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Sequential Monte Carlo in Approximate Bayesian Computation
 Version: 0.1
 Date: 2015-12-25
-Author: Who wrote it
+Author: Tore Brede
 Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: More about what it does (maybe more than one line)
-License: What license is it under?
+License: MIT
 LazyData: TRUE
 Suggests:
     knitr,
     rmarkdown,
     latex2exp,
-    testthat
+    testthat,
+    plotrix
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1

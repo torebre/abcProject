@@ -181,6 +181,7 @@ FindNextEpsilon <-
                              DistanceFunction)
 
     if (sum(weight.updates) == 0) {
+      # TODO Can this happen?
       return(-1)
     }
     weights.new <-
