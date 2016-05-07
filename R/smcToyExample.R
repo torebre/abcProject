@@ -1,13 +1,13 @@
 #' SMC toy example.
 #'
 #' @export
-smcToyExample <- function() {
+smcToyExample <- function(create.debug.variables = F) {
   toyExample <- structure(list(), class = "smcConfiguration")
   observation <- 0
 
-  toyExample[["GenerateRandomPrior"]] <- function() {
+  toyExample[["GenerateRandomPrior"]] <- function(number.of.particles) {
     # Uniform [-10, 10]
-    runif(1, min = -10, max = 10)
+    runif(number.of.particles, min = -10, max = 10)
   }
 
   EvaluateTheta <- function() {
@@ -169,6 +169,22 @@ smcToyExample <- function() {
       rnorm(1, mean = my.theta, sd = 1 / 10)
     }
   }
+
+
+  toyExample[["ExtractSamples"]] <- function(sample.indices, particles) {
+    resampled.particles <- list()
+    counter <- 1
+    for(i in sample.indices) {
+      resampled.particles[[counter]] <- particles[[i]]
+      counter <- counter + 1
+    }
+    resampled.particles
+  }
+
+  toyExample[["ExtractThetas"]] <- function(sample.indices, thetas) {
+    thetas[sample.indices]
+  }
+
 
   toyExample
 }

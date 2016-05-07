@@ -20,18 +20,14 @@ Smc <-
     DistanceFunction <- smc.configuration[["DistanceFunction"]]
     GenerateRandomPrior <-
       smc.configuration[["GenerateRandomPrior"]]
+    ExtractSamples <- smc.configuration[["ExtractSamples"]]
+    ExtractThetas <- smc.configuration[["ExtractThetas"]]
 
     variable.env <- new.env(parent = emptyenv())
 
     # Create an initial set of particles
-    variable.env$thetas <-
-      matrix(sapply(1:number.of.particles, function(x) {
-        GenerateRandomPrior()
-      }),
-      nrow = number.of.particles,
-      ncol = 1)
-    variable.env$particles <-
-      SampleFunction(variable.env$thetas, number.of.replicates)
+    variable.env$thetas <-GenerateRandomPrior(number.of.particles)
+    variable.env$particles <- SampleFunction(variable.env$thetas, number.of.replicates)
 
     counter <- 0
     resample.limit <- number.of.particles * resample.ratio
@@ -55,8 +51,8 @@ Smc <-
           replace = T,
           prob = my.env$weights
         )
-      my.env$particles <- my.env$particles[resampling.indices]
-      my.env$thetas <- my.env$thetas[resampling.indices]
+      my.env$particles <- ExtractSamples(resampling.indices, my.env$particles)
+      my.env$thetas <- ExtractThetas(resampling.indices, my.env$thetas)
       my.env$weights <-
         rep(1 / number.of.particles, number.of.particles)
     }
@@ -95,7 +91,9 @@ Smc <-
           alpha,
           DistanceFunction
         )
-      }, extendInt = "no", c(0, current.epsilon))$root
+      }, interval = c(0, current.epsilon), extendInt = "no", check.conv = T)$root
+
+      print(paste("epsilon.new:", epsilon.new))
 
       # TODO Only compute the weights once, not here and in FindNextEpsilon
       variable.env$weights <-
@@ -107,6 +105,7 @@ Smc <-
             DistanceFunction
           )
         )
+
       if (epsilon.new < current.epsilon) {
         current.epsilon <- epsilon.new
       }
@@ -184,8 +183,8 @@ FindNextEpsilon <-
       # TODO Can this happen?
       return(-1)
     }
-    weights.new <-
-      NormalizeVector(my.previous.weights * weight.updates)
+    weights.new <- NormalizeVector(my.previous.weights * weight.updates)
+    # weights.new <- NormalizeVector(weight.updates)
     ess.new <- ComputeEffectiveSampleSize(weights.new)
 
     return(ess.new - alpha * ess.old)
