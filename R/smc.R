@@ -81,7 +81,7 @@ Smc <-
         break
       }
 
-      if(counter == 10) {
+      if(counter == 150) {
         print("Test")
       }
 
@@ -194,32 +194,6 @@ ComputeEffectiveSampleSize <- function(weights) {
   1 / sum(weights ^ 2)
 }
 
-
-# FindNextEpsilon <-
-#   function(epsilon.candidate,
-#            my.current.epsilon,
-#            my.particles,
-#            my.previous.weights,
-#            alpha,
-#            DistanceFunction) {
-#     ess.old <- ComputeEffectiveSampleSize(my.previous.weights)
-#     weight.updates <-
-#       CalculateWeightUpdates(my.particles,
-#                              my.current.epsilon,
-#                              epsilon.candidate,
-#                              DistanceFunction)
-#
-#     if (sum(weight.updates) == 0) {
-#       # TODO Can this happen?
-#       return(-1)
-#     }
-#     weights.new <- NormalizeVector(my.previous.weights * weight.updates)
-#     # weights.new <- NormalizeVector(weight.updates)
-#     ess.new <- ComputeEffectiveSampleSize(weights.new)
-#
-#     return(ess.new - alpha * ess.old)
-#   }
-
 FindNextEpsilon <-
   function(epsilon.candidate,
            my.current.epsilon,
@@ -238,6 +212,8 @@ FindNextEpsilon <-
       return(-alpha * ess.old)
     }
     weights.new <- NormalizeVector(my.previous.weights * weight.updates)
+    # weights.new <- my.previous.weights * weight.updates
+
     # weights.new <- NormalizeVector(weight.updates)
     ess.new <- ComputeEffectiveSampleSize(weights.new)
 
@@ -306,14 +282,14 @@ CalculateInclusionSum <-
     # }))
 
 
-    replicates.unlisted <- unlist(my.sample.replicates)
+    # replicates.unlisted <- unlist(my.sample.replicates)
 
     inclusion.sum <- 0
-    for(i in 1:length(replicates.unlisted)) {
+    for(i in 1:length(my.sample.replicates)) {
 
       # print(paste("Sample replicates", my.sample.replicates[[i]]))
 
-      if(DistanceFunction(replicates.unlisted[i]) <= my.epsilon) {
+      if(DistanceFunction(unlist(my.sample.replicates[[i]])) <= my.epsilon) {
         inclusion.sum <- 1 + inclusion.sum
       }
 
