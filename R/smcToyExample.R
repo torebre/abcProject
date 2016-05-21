@@ -43,6 +43,10 @@ smcToyExample <- function(create.debug.variables = F) {
   debug.variables$alive.particles <- list()
   debug.variables$accepted <- list()
 
+  toyExample[["GetDebugVariables"]] <- function() {
+    debug.variables
+  }
+
 
   toyExample[["ForwardKernelSample"]] <- function(samples.old,
                                                   theta.old,
@@ -138,12 +142,14 @@ smcToyExample <- function(create.debug.variables = F) {
 
     }
 
+    if(create.debug.variables) {
     debug.variables$accepted[[length(debug.variables$accepted) + 1]] <-
       accepted
     debug.variables$avg.acc.rate[[length(debug.variables$avg.acc.rate) + 1]] <-
       accepted / alive.particles
     debug.variables$alive.particles[[length(debug.variables$alive.particles) + 1]] <-
       alive.particles
+    }
 
     return(list(theta = theta.new, samples = samples.new))
   }
@@ -185,6 +191,10 @@ smcToyExample <- function(create.debug.variables = F) {
     thetas[sample.indices]
   }
 
+
+  # toyExample[["ComputeDistances"]] <- function(sample.indices, thetas) {
+  #   thetas[sample.indices]
+  # }
 
   toyExample
 }

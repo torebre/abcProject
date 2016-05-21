@@ -4,7 +4,8 @@
 \alias{VisualiseToyExampleState}
 \title{Visualise toy example state}
 \usage{
-VisualiseToyExampleState(smc.result, state.to.visualise = -1)
+VisualiseToyExampleState(smc.result, state.to.visualise = -1, use.max,
+  use.run.length, use.thetas)
 }
 \description{
 Visualise toy example state

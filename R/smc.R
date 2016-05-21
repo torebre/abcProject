@@ -81,6 +81,25 @@ Smc <-
         break
       }
 
+      if(counter == 10) {
+        print("Test")
+      }
+
+      # print(paste("weights1:", variable.env$weights))
+
+
+      if(FindNextEpsilon(
+        current.epsilon,
+        current.epsilon,
+        variable.env$particles,
+        variable.env$weights,
+        alpha,
+        DistanceFunction
+      ) < 0) {
+        print(paste("No change in epsilon:", current.epsilon))
+        epsilon.new <- current.epsilon
+      }
+      else {
       # Find next epsilon
       epsilon.new <- uniroot(function(epsilon.candidate) {
         FindNextEpsilon(
@@ -92,8 +111,10 @@ Smc <-
           DistanceFunction
         )
       }, interval = c(0, current.epsilon), extendInt = "no", check.conv = T)$root
+      }
 
       print(paste("epsilon.new:", epsilon.new))
+      # print(paste("weights2:", variable.env$weights))
 
       # TODO Only compute the weights once, not here and in FindNextEpsilon
       variable.env$weights <-
@@ -109,9 +130,18 @@ Smc <-
       if (epsilon.new < current.epsilon) {
         current.epsilon <- epsilon.new
       }
+      # print(paste("weights3:", variable.env$weights))
+      print(paste("Weight sum:", sum(variable.env$weights)))
 
+      if(sum(variable.env$weights) == 0) {
+       effective.sample.size <- 0
+      }
+      else {
       effective.sample.size <-
         ComputeEffectiveSampleSize(variable.env$weights)
+      }
+
+      print(paste("Effective sample size:", effective.sample.size))
 
       # Resampling
       if (effective.sample.size < resample.ratio * number.of.particles) {
@@ -165,6 +195,31 @@ ComputeEffectiveSampleSize <- function(weights) {
 }
 
 
+# FindNextEpsilon <-
+#   function(epsilon.candidate,
+#            my.current.epsilon,
+#            my.particles,
+#            my.previous.weights,
+#            alpha,
+#            DistanceFunction) {
+#     ess.old <- ComputeEffectiveSampleSize(my.previous.weights)
+#     weight.updates <-
+#       CalculateWeightUpdates(my.particles,
+#                              my.current.epsilon,
+#                              epsilon.candidate,
+#                              DistanceFunction)
+#
+#     if (sum(weight.updates) == 0) {
+#       # TODO Can this happen?
+#       return(-1)
+#     }
+#     weights.new <- NormalizeVector(my.previous.weights * weight.updates)
+#     # weights.new <- NormalizeVector(weight.updates)
+#     ess.new <- ComputeEffectiveSampleSize(weights.new)
+#
+#     return(ess.new - alpha * ess.old)
+#   }
+
 FindNextEpsilon <-
   function(epsilon.candidate,
            my.current.epsilon,
@@ -180,8 +235,7 @@ FindNextEpsilon <-
                              DistanceFunction)
 
     if (sum(weight.updates) == 0) {
-      # TODO Can this happen?
-      return(-1)
+      return(-alpha * ess.old)
     }
     weights.new <- NormalizeVector(my.previous.weights * weight.updates)
     # weights.new <- NormalizeVector(weight.updates)
@@ -192,9 +246,14 @@ FindNextEpsilon <-
 
 NormalizeVector <- function(my.vector) {
   my.vector.sum <- sum(my.vector)
+  if(my.vector.sum == 0) {
+    return(rep(0, length(my.vector)))
+  }
   my.vector / my.vector.sum
 }
 
+#'
+#' @export
 CalculateWeightUpdates <-
   function(my.samples,
            my.old.epsilon,
@@ -220,6 +279,11 @@ CalculateWeightUpdateForParticle <-
     sum2 <-
       CalculateInclusionSum(my.samples[my.particle.number], DistanceFunction, my.old.epsilon)
 
+    # TODO Just here to see what happens
+    # if(sum1 == 0 && sum2 == 0) {
+    #   return(1)
+    # }
+
     if (sum1 == 0) {
       return(0)
     }
@@ -236,9 +300,25 @@ CalculateInclusionSum <-
   function(my.sample.replicates,
            DistanceFunction,
            my.epsilon) {
-    sum(sapply(my.sample.replicates, function(x) {
-      DistanceFunction(x) < my.epsilon
-    }))
+
+    # sum(sapply(my.sample.replicates, function(x) {
+    #   DistanceFunction(x) <= my.epsilon
+    # }))
+
+
+    replicates.unlisted <- unlist(my.sample.replicates)
+
+    inclusion.sum <- 0
+    for(i in 1:length(replicates.unlisted)) {
+
+      # print(paste("Sample replicates", my.sample.replicates[[i]]))
+
+      if(DistanceFunction(replicates.unlisted[i]) <= my.epsilon) {
+        inclusion.sum <- 1 + inclusion.sum
+      }
+
+    }
+    inclusion.sum
   }
 
 CalculateWeights <-

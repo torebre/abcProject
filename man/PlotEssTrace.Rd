@@ -4,7 +4,7 @@
 \alias{PlotEssTrace}
 \title{Plot ESS trace.}
 \usage{
-PlotEssTrace(smc.result, state.to.visualise)
+PlotEssTrace(smc.result, state.to.visualise, use.run.length, resample.limit)
 }
 \description{
 Plot ESS trace.

@@ -152,7 +152,7 @@ PlotHistogram <- function(thetas, use.thetas) {
 #' Plot epsilon trace.
 #'
 #' @export
-PlotEpsilonTrace <- function(smc.result, state.to.visualise, use.run.length) {
+PlotEpsilonTrace <- function(smc.result, state.to.visualise, use.run.length, use.eps.max) {
   if(missing(use.run.length)) {
     run.length <- state.to.visualise
   }
@@ -160,15 +160,22 @@ PlotEpsilonTrace <- function(smc.result, state.to.visualise, use.run.length) {
     run.length <- use.run.length
   }
 
+  if(!missing(use.eps.max)) {
+    eps.max <- use.eps.max
+  }
+  else {
+    eps.trace <- unlist(smc.result$epsilons)
+    eps.max <- max(eps.trace)
+  }
+
   plot(
     unlist(smc.result$epsilons)[1:state.to.visualise],
     type = "l",
     ann = F,
     xlim = c(0, run.length),
-    ylim = c(0, 10)
+    ylim = c(0, eps.max)
   )
   title(
-    main = latex2exp::latex2exp("$\\epsilon_{n}$"),
     ylab = latex2exp::latex2exp("$\\epsilon_{n}$"),
     xlab = "n"
   )
@@ -197,8 +204,7 @@ PlotEssTrace <- function(smc.result, state.to.visualise, use.run.length, resampl
   if(!missing(resample.limit)) {
     abline(h = resample.limit)
   }
-  title(main = "ESS",
-        xlab = "n",
+  title(xlab = "n",
         ylab = "ESS")
 }
 

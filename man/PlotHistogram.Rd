@@ -4,9 +4,10 @@
 \alias{PlotHistogram}
 \title{Plot histogram.}
 \usage{
-PlotHistogram(thetas)
+PlotHistogram(thetas, use.thetas)
 }
 \description{
-Plot histogram.
+Note that the thetas are assumed to have been resampled
+before being used as input here.
 }
 

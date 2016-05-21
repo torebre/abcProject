@@ -4,7 +4,7 @@
 \alias{PlotParticles}
 \title{Plot particles.}
 \usage{
-PlotParticles(particles, weights, cex = 0.1, use.max)
+PlotParticles(particles, weights, cex = 0.1, use.max, epsilon)
 }
 \description{
 Plot particles.
