@@ -9,8 +9,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
-library(abcProject)
+```{r, echo = F}
+#library(abcProject)
+# TODO Should this be loaded here?
+#library(MASS)
 ```
 
 Here is a setup of the toy example:

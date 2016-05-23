@@ -4,7 +4,7 @@
 \alias{PlotEpsilonTrace}
 \title{Plot epsilon trace.}
 \usage{
-PlotEpsilonTrace(smc.result, state.to.visualise, use.run.length)
+PlotEpsilonTrace(smc.result, state.to.visualise, use.run.length, use.eps.max)
 }
 \description{
 Plot epsilon trace.

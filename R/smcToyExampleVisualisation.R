@@ -56,7 +56,7 @@ PlotParticles <- function(particles, weights, cex = 0.1, use.max, epsilon) {
     stop("plotrix needed to draw epsilon circle. Please install it.",
          call. = FALSE)
   }
-  else {
+  else if(!missing(epsilon)) {
     epsilon.draw <- T
   }
 
@@ -131,9 +131,8 @@ PlotHistogram <- function(thetas, use.thetas) {
 
   VectorizedPosterior2 <- Vectorize(Posterior2)
 
-  truehist(
+  MASS::truehist(
     unlist(thetas),
-    # freq = F,
     ann = F,
     xlim = c(theta.lower, theta.upper),
     ylim = c(0, 2.5)

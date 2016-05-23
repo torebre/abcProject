@@ -1,0 +1,48 @@
+---
+title: "MA(2) Example"
+author: "Tore Brede"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{MA(2) Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, echo = F}
+#library(abcProject)
+```
+
+Here is a setup of the MA(2) example:
+
+```{r}
+ma.configuration <- smcMovingAverageExample(use.raw.distance.function = T)
+
+result <-
+  Smc(
+    ma.configuration,
+    max.iterations = 10,
+    alpha = 0.9,
+    number.of.particles = 10,
+    number.of.replicates = 1,
+    stop.epsilon = 0.01,
+    start.epsilon = 10000,
+    verbose = F
+  )
+```
+
+If you want to use the autocovariance distance function instead use:
+
+```{r}
+ma.configuration <- smcMovingAverageExample(use.raw.distance.function = F)
+```
+
+```{r}
+state.to.visualise <- length(result[["all.thetas"]])
+PlotEpsilonTrace(result, state.to.visualise)
+```
+
+```{r}
+PlotEssTrace(result, state.to.visualise)
+```
+

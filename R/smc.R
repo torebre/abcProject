@@ -81,13 +81,6 @@ Smc <-
         break
       }
 
-      if(counter == 150) {
-        print("Test")
-      }
-
-      # print(paste("weights1:", variable.env$weights))
-
-
       if(FindNextEpsilon(
         current.epsilon,
         current.epsilon,
@@ -96,7 +89,9 @@ Smc <-
         alpha,
         DistanceFunction
       ) < 0) {
+        if(verbose) {
         print(paste("No change in epsilon:", current.epsilon))
+        }
         epsilon.new <- current.epsilon
       }
       else {
@@ -113,8 +108,9 @@ Smc <-
       }, interval = c(0, current.epsilon), extendInt = "no", check.conv = T)$root
       }
 
+      if(verbose) {
       print(paste("epsilon.new:", epsilon.new))
-      # print(paste("weights2:", variable.env$weights))
+      }
 
       # TODO Only compute the weights once, not here and in FindNextEpsilon
       variable.env$weights <-
@@ -130,8 +126,6 @@ Smc <-
       if (epsilon.new < current.epsilon) {
         current.epsilon <- epsilon.new
       }
-      # print(paste("weights3:", variable.env$weights))
-      print(paste("Weight sum:", sum(variable.env$weights)))
 
       if(sum(variable.env$weights) == 0) {
        effective.sample.size <- 0
@@ -141,7 +135,9 @@ Smc <-
         ComputeEffectiveSampleSize(variable.env$weights)
       }
 
+      if(verbose) {
       print(paste("Effective sample size:", effective.sample.size))
+      }
 
       # Resampling
       if (effective.sample.size < resample.ratio * number.of.particles) {
@@ -212,9 +208,6 @@ FindNextEpsilon <-
       return(-alpha * ess.old)
     }
     weights.new <- NormalizeVector(my.previous.weights * weight.updates)
-    # weights.new <- my.previous.weights * weight.updates
-
-    # weights.new <- NormalizeVector(weight.updates)
     ess.new <- ComputeEffectiveSampleSize(weights.new)
 
     return(ess.new - alpha * ess.old)
@@ -255,11 +248,6 @@ CalculateWeightUpdateForParticle <-
     sum2 <-
       CalculateInclusionSum(my.samples[my.particle.number], DistanceFunction, my.old.epsilon)
 
-    # TODO Just here to see what happens
-    # if(sum1 == 0 && sum2 == 0) {
-    #   return(1)
-    # }
-
     if (sum1 == 0) {
       return(0)
     }
@@ -277,17 +265,8 @@ CalculateInclusionSum <-
            DistanceFunction,
            my.epsilon) {
 
-    # sum(sapply(my.sample.replicates, function(x) {
-    #   DistanceFunction(x) <= my.epsilon
-    # }))
-
-
-    # replicates.unlisted <- unlist(my.sample.replicates)
-
     inclusion.sum <- 0
     for(i in 1:length(my.sample.replicates)) {
-
-      # print(paste("Sample replicates", my.sample.replicates[[i]]))
 
       if(DistanceFunction(unlist(my.sample.replicates[[i]])) <= my.epsilon) {
         inclusion.sum <- 1 + inclusion.sum
