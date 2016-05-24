@@ -1,19 +1,19 @@
 Package: abcProject
 Type: Package
 Title: Sequential Monte Carlo in Approximate Bayesian Computation
-Version: 0.2
-Date: 2016-05-18
+Version: 0.3
+Date: 2016-05-23
 Author: Tore Brede
 Maintainer: Tore Brede <tore.brede@gmail.com>
 Description: A package containing an implementation of an ABC SMC algorithm. Mostly for illustration purposes.
 License: MIT
 LazyData: TRUE
 Suggests:
-    knitr,
-    rmarkdown,
-    latex2exp,
-    testthat,
-    plotrix,
-    MASS
+    knitr(>= 1.12.3),
+    rmarkdown(>= 0.9.5),
+    latex2exp(>= 0.3.3),
+    testthat(>= 0.11.0),
+    plotrix(>= 3.6-1),
+    MASS(>= 7.3-26)
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1

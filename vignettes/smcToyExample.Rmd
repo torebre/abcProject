@@ -9,41 +9,35 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, echo = F}
-#library(abcProject)
-# TODO Should this be loaded here?
-#library(MASS)
-```
-
 Here is a setup of the toy example:
 
 ```{r}
-toy.example.configuration <- smcToyExample()
+toy.example.configuration <- abcProject::smcToyExample()
 ```
 
 
 ```{r}
-result <- Smc(toy.example.configuration, max.iterations = 10)
+result <- abcProject::Smc(toy.example.configuration, max.iterations = 10)
 state.to.visualise <- length(result[["all.thetas"]])
 ```
 
 
 ```{r}
 thetas <- unlist(result[["all.thetas"]][state.to.visualise])
-PlotHistogram(thetas)
+abcProject::PlotHistogram(thetas)
 ```
 
 ```{r}
 particles <- unlist(result[["all.particles"]][state.to.visualise])
 weights <- unlist(result[["all.weights"]][state.to.visualise])
-PlotParticles(particles, weights)
+abcProject::PlotParticles(particles, weights)
 ```
 
 ```{r}
-PlotEpsilonTrace(result, state.to.visualise)
+abcProject::PlotEpsilonTrace(result, state.to.visualise)
 ```
 
 ```{r}
-PlotEssTrace(result, state.to.visualise)
+abcProject::PlotEssTrace(result, state.to.visualise)
 ```
 
