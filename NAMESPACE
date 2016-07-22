@@ -2,6 +2,7 @@
 
 export(CalculateWeightUpdates)
 export(CreateGifAnimation)
+export(CreateMovie)
 export(PlotEpsilonTrace)
 export(PlotEssTrace)
 export(PlotHistogram)

@@ -228,3 +228,23 @@ CreateGifAnimation <- function(smc.result, movie.name, skip.frames = 1) {
     }, movie.name = movie.name, interval = 0.3)
 }
 
+#' @export
+CreateMovie <- function(smc.result, movie.name, skip.frames = 1, interval = 0.3) {
+  if (!requireNamespace("animation", quietly = TRUE)) {
+    stop("animation needed for this function to work. Please install it.",
+         call. = FALSE)
+  }
+
+  distance.max <- max(unlist(smc.result$all.particles))
+  run.length <- length(smc.result$epsilons)
+  all.thetas <- unlist(smc.result$all.thetas)
+  # use.thetas <- c(min(all.thetas), max(all.thetas))
+  use.thetas <- c(-3, 3)
+
+  animation::saveVideo(
+    for(j in seq(1, run.length, by = skip.frames)) {
+      VisualiseToyExampleState(smc.result, state.to.visualise = j,
+                               use.max = distance.max, use.run.length = run.length, use.thetas = use.thetas)
+    }, video.name = movie.name, interval = interval)
+}
+

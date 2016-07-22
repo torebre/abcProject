@@ -244,9 +244,11 @@ CalculateWeightUpdateForParticle <-
            my.new.epsilon,
            DistanceFunction) {
     sum1 <-
-      CalculateInclusionSum(my.samples[my.particle.number], DistanceFunction, my.new.epsilon)
+      CalculateInclusionSum(my.samples[[my.particle.number]], DistanceFunction, my.new.epsilon)
     sum2 <-
-      CalculateInclusionSum(my.samples[my.particle.number], DistanceFunction, my.old.epsilon)
+      CalculateInclusionSum(my.samples[[my.particle.number]], DistanceFunction, my.old.epsilon)
+
+    # print(paste("sum1:",sum1,"sum2:",sum2))
 
     if (sum1 == 0) {
       return(0)
@@ -259,22 +261,37 @@ CalculateWeightUpdateForParticle <-
     sum1 / sum2
   }
 
+# CalculateInclusionSum <-
+#   function(my.sample.replicates,
+#            DistanceFunction,
+#            my.epsilon) {
+#
+#     inclusion.sum <- 0
+#     for(i in 1:length(my.sample.replicates)) {
+#       if(DistanceFunction(unlist(my.sample.replicates[[i]])) <= my.epsilon) {
+#         inclusion.sum <- 1 + inclusion.sum
+#       }
+#     }
+#     inclusion.sum
+#   }
 
+
+# For MA debugging
 CalculateInclusionSum <-
   function(my.sample.replicates,
            DistanceFunction,
            my.epsilon) {
-
     inclusion.sum <- 0
-    for(i in 1:length(my.sample.replicates)) {
+    number.of.rows <- dim(my.sample.replicates)[1]
 
-      if(DistanceFunction(unlist(my.sample.replicates[[i]])) <= my.epsilon) {
+    for (i in 1:number.of.rows) {
+      if (DistanceFunction(my.sample.replicates[i, ]) < my.epsilon) {
         inclusion.sum <- 1 + inclusion.sum
       }
-
     }
     inclusion.sum
   }
+
 
 CalculateWeights <-
   function(old.weight,

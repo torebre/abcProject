@@ -152,17 +152,23 @@ smcMovingAverageExample <-
         # a symmetric distribution so the only term left in the
         # Metropolis-Hastings ratio is the likelihood
 
+
         if (my.weights[j] != 0) {
           # New as nominator, old as denominator
           old.likelihood <-
             EvaluateLikelihoodSum(samples.new[[j]], my.current.epsilon)
 
           if (old.likelihood == 0) {
+
+            print("old.likelihood is 0")
+
             next
           }
 
           metropolis.hastings.ratio <-
             EvaluateLikelihoodSum(replicates.new, my.current.epsilon) / old.likelihood
+
+          # print(paste("MH-ratio: ", metropolis.hastings.ratio))
 
           if (runif(1) <= min(1, metropolis.hastings.ratio)) {
             theta.new[, j] <- theta.candidate

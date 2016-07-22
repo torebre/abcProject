@@ -7,10 +7,10 @@ ma.configuration <- smcMovingAverageExample(create.debug.variables = T)
 ma.example.results <-
   Smc(
     ma.configuration,
-    max.iterations = 100000,
+    max.iterations = 100,
     alpha = 0.9,
     number.of.particles = 1000,
-    number.of.replicates = 1,
+    number.of.replicates = 5,
     stop.epsilon = 0.01,
     start.epsilon = 10000,
     verbose = T

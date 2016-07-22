@@ -20,7 +20,6 @@ smcToyExample <- function(create.debug.variables = F) {
   }
 
   InternalDistanceFunction <- function(my.sample) {
-    # print(paste("Sample: ", my.sample))
     abs(my.sample - observation)
   }
 
@@ -29,10 +28,6 @@ smcToyExample <- function(create.debug.variables = F) {
   EvaluateLikelihoodSum <-
     function(my.sample.vector, my.current.epsilon) {
       sum(sapply(my.sample.vector, function(x) {
-        #       print(paste("x: ", x))
-        #       print(paste("Distance: ", DistanceFunction(x)))
-        #       print(paste("my.current.epsilon: ", my.current.epsilon))
-
         InternalDistanceFunction(x) < my.current.epsilon
       }))
     }
@@ -124,10 +119,7 @@ smcToyExample <- function(create.debug.variables = F) {
         metropolis.hastings.ratio <-
           EvaluateLikelihoodSum(replicates.new, my.current.epsilon) / old.likelihood
 
-        #       print(paste("New: ", EvaluateLikelihoodSum(replicates.new, my.current.epsilon)))
-        #       print(paste("Old: " ,EvaluateLikelihoodSum(samples.old[j], my.current.epsilon)))
-
-        if (runif(1) <= min(1, metropolis.hastings.ratio)) {
+                if (runif(1) <= min(1, metropolis.hastings.ratio)) {
           theta.new[j] <- theta.candidate
           samples.new[[j]] <- replicates.new
 
@@ -137,9 +129,6 @@ smcToyExample <- function(create.debug.variables = F) {
         alive.particles <- alive.particles + 1
 
       }
-
-      # }
-
     }
 
     if(create.debug.variables) {
