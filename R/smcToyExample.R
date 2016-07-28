@@ -7,7 +7,7 @@ smcToyExample <- function(create.debug.variables = F) {
 
   toyExample[["GenerateRandomPrior"]] <- function(number.of.particles) {
     # Uniform [-10, 10]
-    runif(number.of.particles, min = -10, max = 10)
+    as.list(runif(number.of.particles, min = -10, max = 10))
   }
 
   EvaluateTheta <- function() {
@@ -19,15 +19,15 @@ smcToyExample <- function(create.debug.variables = F) {
     0.5 * dnorm(my.x, mean = my.theta, sd = 1) + 0.5 * dnorm(my.x, mean = my.theta, sd = 1 / 10)
   }
 
-  InternalDistanceFunction <- function(my.sample) {
-    abs(my.sample - observation)
+  InternalDistanceFunction <- function(my.sample.replicates) {
+    abs(unlist(my.sample.replicates) - observation)
   }
 
   toyExample[["DistanceFunction"]] <- InternalDistanceFunction
 
   EvaluateLikelihoodSum <-
-    function(my.sample.vector, my.current.epsilon) {
-      sum(sapply(my.sample.vector, function(x) {
+    function(my.sample.list, my.current.epsilon) {
+      sum(sapply(my.sample.list, function(x) {
         InternalDistanceFunction(x) < my.current.epsilon
       }))
     }
@@ -62,8 +62,9 @@ smcToyExample <- function(create.debug.variables = F) {
     #   empirical.variance <- empirical.variance + my.weights[i] * (theta.old[i] - mean.theta)^2
     # }
 
-    samples.new <- rep(samples.old)
-    theta.new <- rep(theta.old)
+    # A copy of the lists is made here
+    samples.new <- samples.old
+    theta.new <- theta.old
 
     accepted <- 0
     alive.particles <- 0
@@ -77,7 +78,7 @@ smcToyExample <- function(create.debug.variables = F) {
 
       # for (k in 1:100) {
       theta.candidate <-
-        rnorm(1, mean = theta.old[j], sqrt(2 * empirical.variance))
+        rnorm(1, mean = theta.old[[j]], sqrt(2 * empirical.variance))
 
       debug.variables$empirical.variance[[length(debug.variables$avg.acc.rate) + 1]] <-
         sqrt(2 * empirical.variance)
@@ -94,7 +95,6 @@ smcToyExample <- function(create.debug.variables = F) {
       # The prior is uniform and the random walk is coming from
       # a symmetric distribution so the only term left in the
       # Metropolis-Hastings ratio is the likelihood
-
       if (my.weights[j] == 0) {
 
         # Try to see what happens when the particles with no
@@ -147,9 +147,9 @@ smcToyExample <- function(create.debug.variables = F) {
     function(my.thetas, my.number.of.replicates) {
       my.samples <- list()
       for (i in 1:length(my.thetas)) {
-        my.replicates <- rep(NA, my.number.of.replicates)
+        my.replicates <- list()
         for (j in 1:my.number.of.replicates) {
-          my.replicates[j] <- GenerateSample(my.thetas[i])
+          my.replicates[[j]] <- GenerateSample(my.thetas[[i]])
         }
         my.samples[[i]] <- my.replicates
       }

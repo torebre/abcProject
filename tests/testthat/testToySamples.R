@@ -14,9 +14,7 @@ test_that("No errors when creating toy samples without replicates", {
       stop.epsilon = 0.01,
       verbose = F
     )
-
 })
-
 
 
 test_that("No errors when creating toy samples with replicates", {

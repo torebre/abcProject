@@ -78,7 +78,7 @@ PlotParticles <- function(particles, weights, cex = 0.1, use.max, epsilon) {
 
   for(j in 1:length(particles)) {
     for(k in 1:length(particles[[1]])) {
-      particle.distance <- particles[[j]][k]
+      particle.distance <- particles[[j]][[k]]
       current.particle.index <- (j - 1) * my.number.of.replicates + k
       x.coords[current.particle.index] <- cos(cumulative.angle) * particle.distance
       y.coords[current.particle.index] <- sin(cumulative.angle) * particle.distance
