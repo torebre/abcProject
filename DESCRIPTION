@@ -17,3 +17,5 @@ Suggests:
     MASS(>= 7.3-26)
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
+LinkingTo:
+    Rcpp

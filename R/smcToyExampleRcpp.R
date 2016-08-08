@@ -1,15 +1,9 @@
 #' SMC toy example.
 #'
 #' @export
-smcToyExample <- function(create.debug.variables = F) {
+smcToyExampleRcpp <- function(create.debug.variables = F) {
   toyExample <- structure(list(), class = "smcConfiguration")
   observation <- 0
-
-
-  toyExample[["print"]] <- function(...) {
-    "ABC SMC configuration for toy example"
-  }
-
 
   toyExample[["GenerateRandomPrior"]] <- function(number.of.particles) {
     # Uniform [-10, 10]
@@ -125,7 +119,7 @@ smcToyExample <- function(create.debug.variables = F) {
         metropolis.hastings.ratio <-
           EvaluateLikelihoodSum(replicates.new, my.current.epsilon) / old.likelihood
 
-                if (runif(1) <= min(1, metropolis.hastings.ratio)) {
+        if (runif(1) <= min(1, metropolis.hastings.ratio)) {
           theta.new[j] <- theta.candidate
           samples.new[[j]] <- replicates.new
 
@@ -138,12 +132,12 @@ smcToyExample <- function(create.debug.variables = F) {
     }
 
     if(create.debug.variables) {
-    debug.variables$accepted[[length(debug.variables$accepted) + 1]] <-
-      accepted
-    debug.variables$avg.acc.rate[[length(debug.variables$avg.acc.rate) + 1]] <-
-      accepted / alive.particles
-    debug.variables$alive.particles[[length(debug.variables$alive.particles) + 1]] <-
-      alive.particles
+      debug.variables$accepted[[length(debug.variables$accepted) + 1]] <-
+        accepted
+      debug.variables$avg.acc.rate[[length(debug.variables$avg.acc.rate) + 1]] <-
+        accepted / alive.particles
+      debug.variables$alive.particles[[length(debug.variables$alive.particles) + 1]] <-
+        alive.particles
     }
 
     return(list(theta = theta.new, samples = samples.new))
@@ -151,15 +145,16 @@ smcToyExample <- function(create.debug.variables = F) {
 
   toyExample[["SampleFunction"]] <-
     function(my.thetas, my.number.of.replicates) {
-      my.samples <- list()
-      for (i in 1:length(my.thetas)) {
-        my.replicates <- list()
-        for (j in 1:my.number.of.replicates) {
-          my.replicates[[j]] <- GenerateSample(my.thetas[[i]])
-        }
-        my.samples[[i]] <- my.replicates
-      }
-      return(my.samples)
+      generateSamples(my.thetas, my.number.of.replicates, 42)
+      #    my.samples <- list()
+      # for (i in 1:length(my.thetas)) {
+      #   my.replicates <- list()
+      #   for (j in 1:my.number.of.replicates) {
+      #     my.replicates[[j]] <- GenerateSample(my.thetas[[i]])
+      #   }
+      #   my.samples[[i]] <- my.replicates
+      # }
+      # return(my.samples)
     }
 
   GenerateSample <- function(my.theta) {
@@ -170,7 +165,6 @@ smcToyExample <- function(create.debug.variables = F) {
       rnorm(1, mean = my.theta, sd = 1 / 10)
     }
   }
-
 
   toyExample[["ExtractSamples"]] <- function(sample.indices, particles) {
     resampled.particles <- list()
@@ -193,4 +187,3 @@ smcToyExample <- function(create.debug.variables = F) {
 
   toyExample
 }
-

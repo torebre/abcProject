@@ -8,7 +8,7 @@ test_that("SMC algorithm can process MA example using raw distance function", {
       ma.configuration,
       max.iterations = 10,
       alpha = 0.9,
-      number.of.particles = 100,
+      number.of.particles = 10,
       number.of.replicates = 1,
       resample.ratio = 0.9,
       stop.epsilon = 0.01,
