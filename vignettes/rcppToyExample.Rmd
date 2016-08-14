@@ -13,3 +13,33 @@ vignette: >
 #library(abcProject)
 ```
 
+Creating example with R:
+```{r}
+toy.example.configuration <- smcToyExample()
+benchmark(toy.example.result <-
+            Smc(
+              toy.example.configuration,
+              max.iterations = 100,
+              alpha = 0.95,
+              number.of.particles = 1000,
+              number.of.replicates = 1,
+              stop.epsilon = 0.01
+            ), replications = 1)
+VisualiseToyExampleState(toy.example.result)
+```
+
+Creating example with Rcpp:
+```{r}
+toy.example.setup.rcpp <- smcToyExampleRcpp()
+benchmark(toy.example.result.rcpp <-
+            Smc(
+              toy.example.configuration,
+              max.iterations = 100,
+              alpha = 0.95,
+              number.of.particles = 1000,
+              number.of.replicates = 1,
+              stop.epsilon = 0.01,
+              verbose = T
+            ), replications = 1)
+VisualiseToyExampleState(toy.example.result.rcpp)
+```

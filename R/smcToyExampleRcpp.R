@@ -86,11 +86,8 @@ smcToyExampleRcpp <- function(create.debug.variables = F) {
       replicates.new <- rep(NA, my.number.of.replicates)
 
       for (i in 1:my.number.of.replicates) {
-        replicates.new[i] <- GenerateSample(theta.candidate)
+        replicates.new[i] <- generateSamples(theta.candidate, 1, -1)
       }
-
-      #   prior.old <- EvaluateTheta(theta.old)
-      #   prior.new <- EvaluateTheta(theta.new)
 
       # The prior is uniform and the random walk is coming from
       # a symmetric distribution so the only term left in the
@@ -110,8 +107,6 @@ smcToyExampleRcpp <- function(create.debug.variables = F) {
         # New as nominator, old as denominator
         old.likelihood <-
           EvaluateLikelihoodSum(samples.new[j], my.current.epsilon)
-
-        # auto.accept <- false
         if (old.likelihood == 0) {
           next
         }
@@ -146,25 +141,7 @@ smcToyExampleRcpp <- function(create.debug.variables = F) {
   toyExample[["SampleFunction"]] <-
     function(my.thetas, my.number.of.replicates) {
       generateSamples(my.thetas, my.number.of.replicates, 42)
-      #    my.samples <- list()
-      # for (i in 1:length(my.thetas)) {
-      #   my.replicates <- list()
-      #   for (j in 1:my.number.of.replicates) {
-      #     my.replicates[[j]] <- GenerateSample(my.thetas[[i]])
-      #   }
-      #   my.samples[[i]] <- my.replicates
-      # }
-      # return(my.samples)
     }
-
-  GenerateSample <- function(my.theta) {
-    if (runif(1) < 0.5) {
-      rnorm(1, mean = my.theta, sd = 1)
-    }
-    else {
-      rnorm(1, mean = my.theta, sd = 1 / 10)
-    }
-  }
 
   toyExample[["ExtractSamples"]] <- function(sample.indices, particles) {
     resampled.particles <- list()
@@ -179,11 +156,6 @@ smcToyExampleRcpp <- function(create.debug.variables = F) {
   toyExample[["ExtractThetas"]] <- function(sample.indices, thetas) {
     thetas[sample.indices]
   }
-
-
-  # toyExample[["ComputeDistances"]] <- function(sample.indices, thetas) {
-  #   thetas[sample.indices]
-  # }
 
   toyExample
 }

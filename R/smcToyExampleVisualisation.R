@@ -9,7 +9,7 @@ VisualiseToyExampleState <-
     }
 
     if(missing(use.max)) {
-      distance.max <- max(unlist(result$all.particles))
+      distance.max <- max(unlist(smc.result$all.particles))
     }
     else {
       distance.max <- use.max
